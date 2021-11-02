@@ -15,6 +15,23 @@ export function getTrendsForAsset(req, res, next) {
      });
 }
 
+export function promisedGetTrendForAsset(ticker, interval): Promise<Trend> {
+     return new Promise((resolve, reject) => {
+          TrendModel.findOne(
+               {
+                    interval: interval,
+                    ticker: { $regex: ticker, $options: 'i' },
+               },
+               function (err, res) {
+                    if (err) {
+                         reject(err);
+                    }
+                    return resolve(res);
+               }
+          );
+     });
+}
+
 export function getTrendsForTimeFrame() {}
 
 export function getMarketSentiment(req, res, next) {
