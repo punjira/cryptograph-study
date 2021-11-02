@@ -30,6 +30,8 @@ export function insertCandlestick(data: Candlestick): Promise<boolean> {
                               }
                               return resolve(true);
                          });
+                    } else {
+                         return resolve(false);
                     }
                })
                .catch((err) => {
@@ -58,4 +60,23 @@ export function getCandlesticks(req, res, next) {
                     data: result,
                });
           });
+}
+
+export function promisedCandlestickOnInterval(
+     ticker: string,
+     interval: string
+): Promise<Candlestick[] | null> {
+     return new Promise((resolve, reject) => {
+          CandlestickModel.find({
+               redis_key: `${ticker}-${interval}`,
+          })
+               .sort({ location: -1 })
+               .limit(1)
+               .exec(function (err, res) {
+                    if (err) {
+                         return reject(err);
+                    }
+                    return resolve(res || null);
+               });
+     });
 }
