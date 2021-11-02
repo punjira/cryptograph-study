@@ -6,8 +6,10 @@ import nats from 'node-nats-streaming';
 import { randomBytes } from 'crypto';
 
 export const TREND_UPDATE_EVENT = 'TREND_EVENT';
-export const CANDLE_UPDATE_EVENT = 'CANDLE_UPDATE';
+export const EXCHANGE_UPDATE_EVENT = 'EXCHANGE_UPDATE';
 export const CANDLESTICK_EVENT = 'CANDLE_STICK_EVENT';
+export const INDICATOR_EVENT = 'INDICATOR_EVENT';
+export const NEW_CANDLE_EVENT = 'NEW_CANDLESTICK_UPDATE_EVENT';
 
 export const natsClient = (function () {
      class NatsClient {
