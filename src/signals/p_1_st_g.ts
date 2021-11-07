@@ -1,7 +1,6 @@
 /**
  *
  */
-import { Exchange } from '@cryptograph-app/shared-models';
 import { promisedGetTrendForAsset as d } from '../controllers/trend.controllers';
 import { promisedGetLatestForTicker as e } from '../controllers/indicator-controller';
 import { getLatestAvailableDate as f } from '../controllers/price-controller';
@@ -11,20 +10,20 @@ import {
      reversal_positives,
 } from '../helpers/candlestick-helper';
 
-export default async function p1R(hk: Exchange[], ol: string) {
-     for (let one of hk) {
-          const m1 = one.ticker;
+export default async function p1R(one: string, ol: string) {
+     try {
+          const m1 = one;
           const k = await d(m1, ol);
-          if (!k) continue;
+          if (!k) return;
           if (k.started_at < 50) return;
           const i9 = await e(m1, ol, 'stochastic');
           const i8 = await f(m1);
           const hk2 = await g(m1, ol);
-          if (!i9) continue;
-          if (!i8) continue;
-          if (laps(i8, 3) > i9.location) continue;
-          if (k.direction === 1 && i9.details === 'overbought') continue;
-          if (k.direction === -1 && i9.details === 'oversold') continue;
+          if (!i9) return;
+          if (!i8) return;
+          if (laps(i8, 3) > i9.location) return;
+          if (k.direction === 1 && i9.details === 'overbought') return;
+          if (k.direction === -1 && i9.details === 'oversold') return;
           const rt = hk2.filter(
                (el) =>
                     (k.direction === 1
@@ -32,9 +31,10 @@ export default async function p1R(hk: Exchange[], ol: string) {
                          : reversal_negatives.includes[el.pattern]) &&
                     el.direction == -1 * k.direction
           );
-          console.log(rt, m1);
+          console.log(rt, m1, ol);
+     } catch (err) {
+          console.log('error while running standard process, Error: ', err);
      }
-     return;
 }
 
 function laps(_: number, c: number): number {
