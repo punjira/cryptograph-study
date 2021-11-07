@@ -10,8 +10,11 @@ export const EXCHANGE_UPDATE_EVENT = 'EXCHANGE_UPDATE';
 export const CANDLESTICK_EVENT = 'CANDLE_STICK_EVENT';
 export const INDICATOR_EVENT = 'INDICATOR_EVENT';
 export const NEW_CANDLE_EVENT = 'NEW_CANDLESTICK_UPDATE_EVENT';
+export const EXCHANGE_LIST_REPLY = 'EXCHANGE_LIST_REPLY';
+export const EXCHANGE_LIST_REQUEST = 'EXCHANGE_LIST_REQUEST';
 
 export const natsClient = (function () {
+     console.log('creating nats client');
      class NatsClient {
           stan: nats.Stan;
           constructor() {
