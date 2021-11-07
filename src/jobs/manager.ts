@@ -1,18 +1,18 @@
 import schedule from 'node-schedule';
-import shup from '../signals/p_1_st_g';
+import { tickerQueue } from './caller';
 
 import { getAllExchanges } from '../controllers/exchange-controller';
 
 export const createStudySchedule = (function () {
      getAllExchanges().then((data) => {
-          const m_1_j = schedule.scheduleJob('*/10 * * * * *', () => {
-               shup(data, '1m');
+          const m_1_j = schedule.scheduleJob('*/2 * * * *', () => {
+               tickerQueue('1m');
           });
           const m_3_j = schedule.scheduleJob('*/4 * * * *', () => {
-               shup(data, '3m');
+               tickerQueue('3m');
           });
           const m_5_j = schedule.scheduleJob('*/6 * * * *', () => {
-               shup(data, '5m');
+               tickerQueue('5m');
           });
      });
      return {
