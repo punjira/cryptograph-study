@@ -6,6 +6,8 @@ import {
 } from '../controllers/trend.controllers';
 import {
      CANDLESTICK_EVENT,
+     EXCHANGE_LIST_REPLY,
+     EXCHANGE_LIST_REQUEST,
      EXCHANGE_UPDATE_EVENT,
      INDICATOR_EVENT,
      natsClient,
@@ -56,104 +58,145 @@ export interface IndicatorUpdateMessage {
      location: number;
 }
 
-natsClient
-     .getInstance()
-     .getClient()
-     .on('connect', () => {
-          const exchange_subscription = natsClient
-               .getInstance()
-               .getClient()
-               .subscribe(EXCHANGE_UPDATE_EVENT);
-          exchange_subscription.on('message', (message: Message) => {
-               const msg = message.getData();
-               if (typeof msg === 'string') {
-                    const exchanges: Exchange[] = JSON.parse(msg);
-                    createExchanges(exchanges)
-                         .then(() => {
-                              logger(
-                                   LOG_LEVELS.INFO,
-                                   'local exchange list updated from nats with ' +
-                                        exchanges.length +
-                                        ' new data',
-                                   'history-provider/nats/subscription.ts'
-                              );
-                         })
-                         .catch((err) => {
-                              logger(
-                                   LOG_LEVELS.ERROR,
-                                   'error writing incoming nats exchange list to local history-provider database Error: ' +
-                                        err,
-                                   'history-provider/nats/subscription.ts'
-                              );
-                         });
-               }
-          });
-          const trend_subscription = natsClient
-               .getInstance()
-               .getClient()
-               .subscribe(TREND_UPDATE_EVENT);
-          trend_subscription.on('message', (message: Message) => {
-               const msg = message.getData();
-               if (typeof msg === 'string') {
-                    const data: TrendUpdateMessage = JSON.parse(msg);
-                    if (data.status) {
-                         //keep it async, this might introduce side effects by fixing it \
-                         // by awaiting this action is not the answer \
-                         // try setting up a flow for sequence id @todo
-                         updateAssetTrend(data);
-                    } else {
-                         removeAssetTrend(data);
+export function createSubscriptions() {
+     console.log('waiting for nats client to connect');
+     natsClient
+          .getInstance()
+          .getClient()
+          .on('connect', () => {
+               natsClient
+                    .getInstance()
+                    .getClient()
+                    .publish(EXCHANGE_LIST_REQUEST);
+               console.log('nats connection created, creating subscriptions');
+               const exchange_reply_subscriptions = natsClient
+                    .getInstance()
+                    .getClient()
+                    .subscribe(EXCHANGE_LIST_REPLY);
+               exchange_reply_subscriptions.on(
+                    'message',
+                    (message: Message) => {
+                         const msg = message.getData();
+                         if (typeof msg === 'string') {
+                              const exchanges: Exchange[] = JSON.parse(msg);
+                              createExchanges(exchanges)
+                                   .then(() => {
+                                        logger(
+                                             LOG_LEVELS.INFO,
+                                             'local exchange list updated from nats with ' +
+                                                  exchanges.length +
+                                                  ' new data',
+                                             'history-provider/nats/subscription.ts'
+                                        );
+                                   })
+                                   .catch((err) => {
+                                        logger(
+                                             LOG_LEVELS.ERROR,
+                                             'error writing incoming nats exchange list to local history-provider database Error: ' +
+                                                  err,
+                                             'history-provider/nats/subscription.ts'
+                                        );
+                                   });
+                         }
                     }
-               }
-          });
-          /**
-           * we need the latest and only the latest candlestick for each ticker.
-           */
-          const candle_update_subscription = natsClient
-               .getInstance()
-               .getClient()
-               .subscribe(NEW_CANDLE_EVENT);
-          candle_update_subscription.on('message', (message: Message) => {
-               const msg = message.getData();
-               if (typeof msg === 'string') {
-                    const parsed: NewCandlestickEvent = JSON.parse(msg);
-                    const priceObj = createPriceFromCandlestick(parsed);
-                    upsertPrice(priceObj)
-                         .then((d) => {})
-                         .catch((err) => {
-                              logger(
-                                   LOG_LEVELS.ERROR,
-                                   'error while updating streamed price, Error: ' +
-                                        err,
-                                   'study/nats/sbscription.ts __candle_update_subscription'
-                              );
-                         });
-               }
-          });
-          const candlestick_subscription = natsClient
-               .getInstance()
-               .getClient()
-               .subscribe(CANDLESTICK_EVENT);
-          candlestick_subscription.on('message', (message: Message) => {
-               const msg = message.getData();
-               if (typeof msg === 'string') {
-                    const parsed: CandlestickUpdateMessage[] = JSON.parse(msg);
-                    for (let one of parsed) {
-                         insertCandlestick(createCandlestickObject(one));
+               );
+               const exchange_subscription = natsClient
+                    .getInstance()
+                    .getClient()
+                    .subscribe(EXCHANGE_UPDATE_EVENT);
+               exchange_subscription.on('message', (message: Message) => {
+                    const msg = message.getData();
+                    if (typeof msg === 'string') {
+                         const exchanges: Exchange[] = JSON.parse(msg);
+                         createExchanges(exchanges)
+                              .then(() => {
+                                   logger(
+                                        LOG_LEVELS.INFO,
+                                        'local exchange list updated from nats with ' +
+                                             exchanges.length +
+                                             ' new data',
+                                        'history-provider/nats/subscription.ts'
+                                   );
+                              })
+                              .catch((err) => {
+                                   logger(
+                                        LOG_LEVELS.ERROR,
+                                        'error writing incoming nats exchange list to local history-provider database Error: ' +
+                                             err,
+                                        'history-provider/nats/subscription.ts'
+                                   );
+                              });
                     }
-               }
-          });
-          const indicator_subscription = natsClient
-               .getInstance()
-               .getClient()
-               .subscribe(INDICATOR_EVENT);
-          indicator_subscription.on('message', (message: Message) => {
-               const msg = message.getData();
-               if (typeof msg === 'string') {
-                    const parsed: IndicatorUpdateMessage[] = JSON.parse(msg);
-                    for (let one of parsed) {
-                         insertIndicator(createIndicatorObject(one));
+               });
+               // const trend_subscription = natsClient
+               //      .getInstance()
+               //      .getClient()
+               //      .subscribe(TREND_UPDATE_EVENT);
+               // trend_subscription.on('message', (message: Message) => {
+               //      const msg = message.getData();
+               //      if (typeof msg === 'string') {
+               //           const data: TrendUpdateMessage = JSON.parse(msg);
+               //           if (data.status) {
+               //                //keep it async, this might introduce side effects by fixing it \
+               //                // by awaiting this action is not the answer \
+               //                // try setting up a flow for sequence id @todo
+               //                updateAssetTrend(data);
+               //           } else {
+               //                removeAssetTrend(data);
+               //           }
+               //      }
+               // });
+               /**
+                * we need the latest and only the latest candlestick for each ticker.
+                */
+               const candle_update_subscription = natsClient
+                    .getInstance()
+                    .getClient()
+                    .subscribe(NEW_CANDLE_EVENT);
+               candle_update_subscription.on('message', (message: Message) => {
+                    const msg = message.getData();
+                    if (typeof msg === 'string') {
+                         const parsed: NewCandlestickEvent = JSON.parse(msg);
+                         const priceObj = createPriceFromCandlestick(parsed);
+                         upsertPrice(priceObj)
+                              .then((d) => {})
+                              .catch((err) => {
+                                   logger(
+                                        LOG_LEVELS.ERROR,
+                                        'error while updating streamed price, Error: ' +
+                                             err,
+                                        'study/nats/sbscription.ts __candle_update_subscription'
+                                   );
+                              });
                     }
-               }
+               });
+               // const candlestick_subscription = natsClient
+               //      .getInstance()
+               //      .getClient()
+               //      .subscribe(CANDLESTICK_EVENT);
+               // candlestick_subscription.on('message', (message: Message) => {
+               //      const msg = message.getData();
+               //      if (typeof msg === 'string') {
+               //           const parsed: CandlestickUpdateMessage[] =
+               //                JSON.parse(msg);
+               //           for (let one of parsed) {
+               //                insertCandlestick(createCandlestickObject(one));
+               //           }
+               //      }
+               // });
+               // const indicator_subscription = natsClient
+               //      .getInstance()
+               //      .getClient()
+               //      .subscribe(INDICATOR_EVENT);
+               // indicator_subscription.on('message', (message: Message) => {
+               //      const msg = message.getData();
+               //      if (typeof msg === 'string') {
+               //           const parsed: IndicatorUpdateMessage[] =
+               //                JSON.parse(msg);
+               //           for (let one of parsed) {
+               //                insertIndicator(createIndicatorObject(one));
+               //           }
+               //      }
+               // });
           });
-     });
+}
