@@ -24,7 +24,7 @@ export function promisedGetTrendForAsset(ticker, interval): Promise<Trend> {
                },
                function (err, res) {
                     if (err) {
-                         reject(err);
+                         return reject(err);
                     }
                     return resolve(res);
                }

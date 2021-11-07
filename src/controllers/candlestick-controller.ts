@@ -71,7 +71,6 @@ export function promisedCandlestickOnInterval(
                redis_key: `${ticker}-${interval}`,
           })
                .sort({ location: -1 })
-               .limit(1)
                .exec(function (err, res) {
                     if (err) {
                          return reject(err);
