@@ -1,11 +1,11 @@
-import { Candlestick } from '../models/candlestick-model';
-import { Indicator } from '../models/indicator-model';
-import { Price } from '../models/price-model';
 import {
      CandlestickUpdateMessage,
      IndicatorUpdateMessage,
-     NewCandlestickEvent,
-} from '../nats/sbscription';
+} from '../jobs/caller';
+import { Candlestick } from '../models/candlestick-model';
+import { Indicator } from '../models/indicator-model';
+import { Price } from '../models/price-model';
+import { NewCandlestickEvent } from '../nats/sbscription';
 
 export function createCandlestickObject(
      data: CandlestickUpdateMessage
