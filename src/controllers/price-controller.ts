@@ -35,3 +35,14 @@ export function getLatestAvailableDate(ticker: string): Promise<number | null> {
           );
      });
 }
+
+export function getLatestAvailablePrice(ticker: string): Promise<Price | null> {
+     return new Promise((resolve, reject) => {
+          PriceModel.findOne({ ticker: ticker }, function (err, res) {
+               if (err) {
+                    return reject(err);
+               }
+               return resolve(res || null);
+          });
+     });
+}
