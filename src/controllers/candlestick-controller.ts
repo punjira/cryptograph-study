@@ -1,3 +1,4 @@
+import { Document } from 'mongoose';
 import { Candlestick, CandlestickModel } from '../models/candlestick-model';
 
 export function checkExisting(data: Candlestick): Promise<boolean> {
@@ -62,10 +63,13 @@ export function getCandlesticks(req, res, next) {
           });
 }
 
+/**
+ * skipping typescript to access object_id on result
+ */
 export function promisedCandlestickOnInterval(
      ticker: string,
      interval: string
-): Promise<Candlestick[] | null> {
+): Promise<any[] | null> {
      return new Promise((resolve, reject) => {
           CandlestickModel.find({
                redis_key: `${ticker}-${interval}`,
