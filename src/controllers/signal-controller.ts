@@ -1,5 +1,8 @@
 import { InternalServerError } from '@cryptograph-app/error-handlers';
+import { frameMap, getLocationThreshold } from '../helpers/signal-helpers';
 import { Signal, SignalModel } from '../models/signal-model';
+import { createP_1_st_gFeed } from '../helpers/signal-helpers';
+import { createFeed } from './feed-controller';
 
 export function addSignal(data: Signal) {
      return new Promise((resolve, reject) => {
@@ -7,6 +10,7 @@ export function addSignal(data: Signal) {
                if (err) {
                     return reject(err);
                }
+               createFeed(createP_1_st_gFeed(data.location, res._id));
                return resolve(res);
           });
      });
@@ -38,4 +42,53 @@ export function promisedGetSignals(
                return resolve(res);
           });
      });
+}
+
+export function getLiveSignals(req, res, next) {
+     const symbol = req.query.symbol;
+     const interval = req.query.interval;
+     const signal = req.query.signal;
+     let query: any = {};
+     if (symbol) query.redis_key = { $regex: symbol, $options: 'i' };
+     if (interval) query.interval = interval;
+     if (signal) query.name = signal;
+     if (interval) {
+          SignalModel.find(query, function (err, result) {
+               if (err) {
+                    throw new InternalServerError();
+               }
+               return res.status(200).json({
+                    data: result,
+               });
+          });
+     }
+     const promises = Object.keys(frameMap).map((el) => {
+          return new Promise((resolve, reject) => {
+               const nb = getLocationThreshold(el);
+               SignalModel.find(
+                    {
+                         ...query,
+                         location: {
+                              $gte: nb,
+                         },
+                    },
+                    function (err, result) {
+                         if (err) {
+                              console.log(err);
+                              return reject(err);
+                         }
+                         resolve(result);
+                    }
+               );
+          });
+     });
+     Promise.all(promises)
+          .then((data) => {
+               res.status(200).json({
+                    data,
+               });
+          })
+          .catch((err) => {
+               throw new InternalServerError();
+          });
 }
