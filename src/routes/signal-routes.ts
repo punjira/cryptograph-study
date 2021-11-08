@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
 
-import { getSignals } from '../controllers/signal-controller';
+import { getLiveSignals } from '../controllers/signal-controller';
 
-router.get('/find', getSignals);
+router.get('/find', getLiveSignals);
 
 export default router;
