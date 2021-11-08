@@ -8,6 +8,7 @@ interface Trend {
      direction?: 1 | -1;
      strength?: boolean;
      started_at?: number;
+     location: number;
      dollar_volume?: number;
 }
 
@@ -17,6 +18,10 @@ const trendSchema = new mongoose.Schema<Trend>(
                type: String,
                required: true,
                unique: false,
+          },
+          location: {
+               type: Number,
+               required: true,
           },
           interval: {
                type: String,
