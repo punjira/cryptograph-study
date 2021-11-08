@@ -16,10 +16,12 @@ MongoConenct(() => {
 import TrendRouter from './routes/trend-routes';
 import CandlestickRouter from './routes/candlestick-routes';
 import IndicatorRouter from './routes/indicator-routes';
+import SignalRouter from './routes/signal-routes';
 
 app.use('/trend', TrendRouter);
 app.use('/candlestick', CandlestickRouter);
 app.use('/indicator', IndicatorRouter);
+app.use('/signal', SignalRouter);
 
 app.listen(process.env.PORT, () => {
      console.log('study server is up on port ,', process.env.PORT);
