@@ -15,17 +15,19 @@ import inv from '../signals/p_1_st_g';
 
 const file_location = 'study/jobs/caller.ts';
 
-interface TrendResponse {
-     data?: {
-          key: string;
-          status: 1;
-          details?: {
-               dir: string;
-               strength: boolean;
-               started: number;
-               dollar_volume: number;
-          };
+export interface TrendUpdateMessage {
+     key: string;
+     status: 1;
+     location: number;
+     details?: {
+          dir: string;
+          strength: boolean;
+          started: number;
+          dollar_volume: number;
      };
+}
+interface TrendResponse {
+     data?: TrendUpdateMessage;
 }
 
 export interface CandlestickUpdateMessage {
@@ -135,15 +137,29 @@ export async function tickerQueue(interval) {
      try {
           const exchange = await getAllExchanges();
           exchange.forEach(async (el) => {
-               trendPuppeteer(el.ticker, interval);
-               candlestickPatternPuppeteer(el.ticker, interval);
-               indicatorPatternPuppeteer(el.ticker, interval);
-               inv(el.ticker, interval);
+               await trendPuppeteer(el.ticker, interval);
+               await candlestickPatternPuppeteer(el.ticker, interval);
+               await indicatorPatternPuppeteer(el.ticker, interval);
           });
      } catch (err: any) {
           logger(
                LOG_LEVELS.ERROR,
-               'error while calling trend service, Error: ' + err,
+               'error while calling update events service, Error: ' + err,
+               file_location + 'trendPuppeteer'
+          );
+     }
+}
+
+export async function studyQueue(interval: string) {
+     try {
+          const exchange = await getAllExchanges();
+          exchange.forEach(async (el) => {
+               await inv(el.ticker, interval);
+          });
+     } catch (err: any) {
+          logger(
+               LOG_LEVELS.ERROR,
+               'error while calling study service, Error: ' + err,
                file_location + 'trendPuppeteer'
           );
      }
