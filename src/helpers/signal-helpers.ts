@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongoose';
+import { Feed, FeedType } from '../models/feed-model';
 import { Signal } from '../models/signal-model';
 
 export function createSignalObject(
@@ -18,4 +20,32 @@ export function createSignalObject(
           name,
           candlesticks: candlesticks,
      };
+}
+
+export const frameMap = {
+     '1m': 60000,
+     '3m': 180000,
+     '5m': 300000,
+     '15m': 900000,
+     '30m': 1800000,
+     '1h': 3600000,
+     '2h': 7200000,
+     '4h': 14400000,
+     '1d': 86400000,
+};
+
+export function getLocationThreshold(interval: string, threshold: number = 5) {
+     return +new Date() - threshold * frameMap[interval];
+}
+
+export function createP_1_st_gFeed(date: number, signal: ObjectId): Feed {
+     const feed: Feed = {
+          farsi_test: '',
+          english_test: '',
+          date: date,
+          type: FeedType.SIGNAL,
+          signal,
+          name: 'p_1_st_g',
+     };
+     return;
 }
