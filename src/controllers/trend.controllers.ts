@@ -1,6 +1,6 @@
 import { InternalServerError } from '@cryptograph-app/error-handlers';
 import { TrendModel, Trend } from '../models/trend-model';
-import { TrendUpdateMessage } from '../nats/sbscription';
+import { TrendUpdateMessage } from '../jobs/caller';
 
 export function getTrendsForAsset(req, res, next) {
      const symbol = req.query.symbol;
@@ -20,7 +20,7 @@ export function promisedGetTrendForAsset(ticker, interval): Promise<Trend> {
           TrendModel.findOne(
                {
                     interval: interval,
-                    ticker: { $regex: ticker, $options: 'i' },
+                    ticker: ticker,
                },
                function (err, res) {
                     if (err) {
@@ -64,6 +64,7 @@ export function getMarketSentiment(req, res, next) {
 export function updateAssetTrend(data: TrendUpdateMessage): Promise<Trend> {
      return new Promise((resolve, reject) => {
           const Obj: Trend = {
+               location: data.location,
                ticker: data.key.split('-')[0],
                interval: data.key.split('-')[1],
                redisKey: data.key,
