@@ -1,61 +1,20 @@
 import { Message } from 'node-nats-streaming';
 import { Exchange } from '@cryptograph-app/shared-models';
 import {
-     removeAssetTrend,
-     updateAssetTrend,
-} from '../controllers/trend.controllers';
-import {
-     CANDLESTICK_EVENT,
      EXCHANGE_LIST_REPLY,
      EXCHANGE_LIST_REQUEST,
      EXCHANGE_UPDATE_EVENT,
-     INDICATOR_EVENT,
      natsClient,
      NEW_CANDLE_EVENT,
-     TREND_UPDATE_EVENT,
 } from './nat-helper';
-import { insertCandlestick } from '../controllers/candlestick-controller';
-import {
-     createCandlestickObject,
-     createIndicatorObject,
-     createPriceFromCandlestick,
-} from '../helpers/data-convertors';
-import { insertIndicator } from '../controllers/indicator-controller';
+import { createPriceFromCandlestick } from '../helpers/data-convertors';
 import { upsertPrice } from '../controllers/price-controller';
 import { logger, LOG_LEVELS } from '../../winston';
 import { createExchanges } from '../controllers/exchange-controller';
 
-export interface TrendUpdateMessage {
-     key: string;
-     status: number;
-     details?: {
-          dir: string;
-          strength: boolean;
-          started: number;
-          dollar_volume: number;
-     };
-}
-
-export interface CandlestickUpdateMessage {
-     key: string;
-     pattern: string;
-     location: number;
-     interval: string;
-     direction: number;
-}
-
 export interface NewCandlestickEvent {
      ticker: string;
      data: number[];
-}
-
-export interface IndicatorUpdateMessage {
-     key: string;
-     base_indicator: string;
-     type: string;
-     interval: string;
-     ticker: string;
-     location: number;
 }
 
 export function createSubscriptions() {
@@ -128,24 +87,6 @@ export function createSubscriptions() {
                               });
                     }
                });
-               // const trend_subscription = natsClient
-               //      .getInstance()
-               //      .getClient()
-               //      .subscribe(TREND_UPDATE_EVENT);
-               // trend_subscription.on('message', (message: Message) => {
-               //      const msg = message.getData();
-               //      if (typeof msg === 'string') {
-               //           const data: TrendUpdateMessage = JSON.parse(msg);
-               //           if (data.status) {
-               //                //keep it async, this might introduce side effects by fixing it \
-               //                // by awaiting this action is not the answer \
-               //                // try setting up a flow for sequence id @todo
-               //                updateAssetTrend(data);
-               //           } else {
-               //                removeAssetTrend(data);
-               //           }
-               //      }
-               // });
                /**
                 * we need the latest and only the latest candlestick for each ticker.
                 */
@@ -170,33 +111,5 @@ export function createSubscriptions() {
                               });
                     }
                });
-               // const candlestick_subscription = natsClient
-               //      .getInstance()
-               //      .getClient()
-               //      .subscribe(CANDLESTICK_EVENT);
-               // candlestick_subscription.on('message', (message: Message) => {
-               //      const msg = message.getData();
-               //      if (typeof msg === 'string') {
-               //           const parsed: CandlestickUpdateMessage[] =
-               //                JSON.parse(msg);
-               //           for (let one of parsed) {
-               //                insertCandlestick(createCandlestickObject(one));
-               //           }
-               //      }
-               // });
-               // const indicator_subscription = natsClient
-               //      .getInstance()
-               //      .getClient()
-               //      .subscribe(INDICATOR_EVENT);
-               // indicator_subscription.on('message', (message: Message) => {
-               //      const msg = message.getData();
-               //      if (typeof msg === 'string') {
-               //           const parsed: IndicatorUpdateMessage[] =
-               //                JSON.parse(msg);
-               //           for (let one of parsed) {
-               //                insertIndicator(createIndicatorObject(one));
-               //           }
-               //      }
-               // });
           });
 }
