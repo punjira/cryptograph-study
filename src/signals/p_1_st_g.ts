@@ -6,6 +6,7 @@ import { promisedGetLatestForTicker as e } from '../controllers/indicator-contro
 import { getLatestAvailablePrice as f } from '../controllers/price-controller';
 import { promisedCandlestickOnInterval as g } from '../controllers/candlestick-controller';
 import { createSignalObject as l, frameMap } from '../helpers/signal-helpers';
+import { getCoinInfo as b } from '../controllers/coin-info-controller';
 import {
      reversal_negatives,
      reversal_positives,
@@ -20,6 +21,7 @@ export default async function p1R(one: string, ol: string) {
      try {
           const m1 = one;
           const k = await d(m1, ol); // trend
+          const y = await b(m1);
           if (!k) return;
           if (k.started_at < 50) return;
           const i9 = await e(m1, ol, 'stochastic'); // indicator
@@ -53,7 +55,8 @@ export default async function p1R(one: string, ol: string) {
                     i8.date,
                     k.direction === 1 ? 'long' : 'short',
                     'p_1_st_g',
-                    rt.filter((el) => el._id)
+                    rt.filter((el) => el._id),
+                    y._id
                );
                await addSignal(m4);
           }
