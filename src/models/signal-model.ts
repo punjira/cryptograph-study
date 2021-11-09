@@ -7,11 +7,13 @@ export interface Signal {
      key: string;
      name: string;
      candlesticks?: mongoose.Schema.Types.ObjectId[];
+     coin: mongoose.Schema.Types.ObjectId;
      direction: string;
      at_price: number;
      take_profit?: number;
      stop_loss?: number;
      c_score?: number;
+     signal_key: string;
 }
 
 const SignalSchema = new mongoose.Schema<Signal>({
@@ -41,6 +43,11 @@ const SignalSchema = new mongoose.Schema<Signal>({
                ref: 'Candlesticks',
           },
      ],
+     coin: {
+          required: true,
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'coin',
+     },
      direction: {
           type: String,
           required: true,
@@ -60,6 +67,10 @@ const SignalSchema = new mongoose.Schema<Signal>({
      c_score: {
           type: Number,
           required: false,
+     },
+     signal_key: {
+          required: true,
+          type: String,
      },
 });
 
