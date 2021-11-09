@@ -62,12 +62,11 @@ export function getLiveSignals(req, res, next) {
      const promises = Object.keys(frameMap).map((el) => {
           return new Promise((resolve, reject) => {
                const nb = getLocationThreshold(el);
-               SignalModel.find(query)
+               SignalModel.find({ ...query, interval: el })
                     .where('location')
                     .gte(nb)
                     .exec(function (err, result) {
                          if (err) {
-                              console.log(err);
                               return reject(err);
                          }
                          resolve(result);
@@ -76,8 +75,11 @@ export function getLiveSignals(req, res, next) {
      });
      Promise.all(promises)
           .then((data) => {
+               const result = data.reduce((acc: Signal[], cur: Signal[]) => {
+                    return acc.concat(cur);
+               }, []);
                res.status(200).json({
-                    data,
+                    data: result,
                });
           })
           .catch((err) => {
