@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongoose';
-import { Feed, FeedType } from '../models/feed-model';
 import { Signal } from '../models/signal-model';
 
 export function createSignalObject(
@@ -36,16 +34,4 @@ export const frameMap = {
 
 export function getLocationThreshold(interval: string, threshold: number = 5) {
      return +new Date() - threshold * frameMap[interval];
-}
-
-export function createP_1_st_gFeed(date: number, signal: ObjectId): Feed {
-     const feed: Feed = {
-          farsi_test: '',
-          english_test: '',
-          date: date,
-          type: FeedType.SIGNAL,
-          signal,
-          name: 'p_1_st_g',
-     };
-     return;
 }
