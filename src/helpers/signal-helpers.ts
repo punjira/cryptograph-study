@@ -1,4 +1,6 @@
+import { ObjectId } from 'mongoose';
 import { Signal } from '../models/signal-model';
+import { createHash } from 'crypto';
 
 export function createSignalObject(
      key: string,
@@ -6,8 +8,10 @@ export function createSignalObject(
      date: number,
      direction: string,
      name: string,
-     candlesticks: any[]
+     candlesticks: ObjectId[],
+     coin: ObjectId
 ): Signal {
+     const signal_key = createSignalKey(key, name, direction, candlesticks);
      return {
           key,
           ticker: key.split('-')[0],
@@ -17,6 +21,8 @@ export function createSignalObject(
           direction: direction,
           name,
           candlesticks: candlesticks,
+          signal_key,
+          coin,
      };
 }
 
@@ -34,4 +40,17 @@ export const frameMap = {
 
 export function getLocationThreshold(interval: string, threshold: number = 5) {
      return +new Date() - threshold * frameMap[interval];
+}
+
+export function createSignalKey(
+     key: string,
+     name: string,
+     direction: string,
+     candleSticks: ObjectId[]
+): string {
+     let signal = `${name}${key}${direction}`;
+     for (let one of candleSticks) {
+          signal = signal + one;
+     }
+     return createHash('sha256').update(signal).digest('base64');
 }
