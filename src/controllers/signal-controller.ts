@@ -62,21 +62,16 @@ export function getLiveSignals(req, res, next) {
      const promises = Object.keys(frameMap).map((el) => {
           return new Promise((resolve, reject) => {
                const nb = getLocationThreshold(el);
-               SignalModel.find(
-                    {
-                         ...query,
-                         location: {
-                              $gte: nb,
-                         },
-                    },
-                    function (err, result) {
+               SignalModel.find(query)
+                    .where('location')
+                    .gte(nb)
+                    .exec(function (err, result) {
                          if (err) {
                               console.log(err);
                               return reject(err);
                          }
                          resolve(result);
-                    }
-               );
+                    });
           });
      });
      Promise.all(promises)
