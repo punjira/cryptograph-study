@@ -12,6 +12,8 @@ export const INDICATOR_EVENT = 'INDICATOR_EVENT';
 export const NEW_CANDLE_EVENT = 'NEW_CANDLESTICK_UPDATE_EVENT';
 export const EXCHANGE_LIST_REPLY = 'EXCHANGE_LIST_REPLY';
 export const EXCHANGE_LIST_REQUEST = 'EXCHANGE_LIST_REQUEST';
+export const COIN_INFO_LIST_REQUEST = 'COIN_INFO_LIST_REQUEST';
+export const COIN_INFO_LIST_REPLY = 'COIN_INFO_LIST_REPLY';
 
 export const natsClient = (function () {
      console.log('creating nats client');
