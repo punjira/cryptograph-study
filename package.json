@@ -29,7 +29,7 @@
      },
      "dependencies": {
           "@cryptograph-app/error-handlers": "^0.0.3-beta",
-          "@cryptograph-app/shared-models": "0.0.1-beta",
+          "@cryptograph-app/shared-models": "0.0.4-beta",
           "axios": "^0.23.0",
           "body-parser": "^1.19.0",
           "cors": "^2.8.5",
