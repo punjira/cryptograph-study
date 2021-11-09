@@ -2,13 +2,32 @@ import { InternalServerError } from '@cryptograph-app/error-handlers';
 import { frameMap, getLocationThreshold } from '../helpers/signal-helpers';
 import { Signal, SignalModel } from '../models/signal-model';
 
+export function checkSignal(data: Signal) {
+     return new Promise((resolve, reject) => {
+          SignalModel.findOne(
+               { signal_key: data.signal_key },
+               function (err, res) {
+                    if (err) {
+                         reject(err);
+                    }
+                    resolve(res ? true : false);
+               }
+          );
+     });
+}
+
 export function addSignal(data: Signal) {
      return new Promise((resolve, reject) => {
-          SignalModel.create(data, function (err, res) {
-               if (err) {
-                    return reject(err);
+          checkSignal(data).then((ex) => {
+               if (!ex) {
+                    SignalModel.create(data, function (err, res) {
+                         if (err) {
+                              return reject(err);
+                         }
+                         return resolve(res);
+                    });
                }
-               return resolve(res);
+               resolve(null);
           });
      });
 }
@@ -50,14 +69,16 @@ export function getLiveSignals(req, res, next) {
      if (interval) query.interval = interval;
      if (signal) query.name = signal;
      if (interval) {
-          SignalModel.find(query, function (err, result) {
-               if (err) {
-                    throw new InternalServerError();
-               }
-               return res.status(200).json({
-                    data: result,
+          SignalModel.find(query)
+               .populate('coin')
+               .exec(function (err, result) {
+                    if (err) {
+                         throw new InternalServerError();
+                    }
+                    return res.status(200).json({
+                         data: result,
+                    });
                });
-          });
      }
      const promises = Object.keys(frameMap).map((el) => {
           return new Promise((resolve, reject) => {
@@ -65,6 +86,7 @@ export function getLiveSignals(req, res, next) {
                SignalModel.find({ ...query, interval: el })
                     .where('location')
                     .gte(nb)
+                    .populate('coin')
                     .exec(function (err, result) {
                          if (err) {
                               return reject(err);
