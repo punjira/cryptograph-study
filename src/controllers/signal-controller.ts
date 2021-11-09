@@ -1,8 +1,6 @@
 import { InternalServerError } from '@cryptograph-app/error-handlers';
 import { frameMap, getLocationThreshold } from '../helpers/signal-helpers';
 import { Signal, SignalModel } from '../models/signal-model';
-import { createP_1_st_gFeed } from '../helpers/signal-helpers';
-import { createFeed } from './feed-controller';
 
 export function addSignal(data: Signal) {
      return new Promise((resolve, reject) => {
@@ -10,7 +8,6 @@ export function addSignal(data: Signal) {
                if (err) {
                     return reject(err);
                }
-               createFeed(createP_1_st_gFeed(data.location, res._id));
                return resolve(res);
           });
      });
