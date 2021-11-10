@@ -12,6 +12,7 @@ import {
      reversal_positives,
 } from '../helpers/candlestick-helper';
 import { addSignal } from '../controllers/signal-controller';
+import { natsClient, NEW_SIGNAL_EVENT } from '../nats/nat-helper';
 
 function laps(_: number, c: number, k: string): number {
      return _ - c * frameMap[k];
@@ -59,6 +60,13 @@ export default async function p1R(one: string, ol: string) {
                     y._id
                );
                await addSignal(m4);
+               natsClient
+                    .getInstance()
+                    .getClient()
+                    .publish(
+                         NEW_SIGNAL_EVENT,
+                         JSON.stringify({ ...m4, coin: y })
+                    );
           }
      } catch (err) {
           console.log('error while running standard process, Error: ', err);
