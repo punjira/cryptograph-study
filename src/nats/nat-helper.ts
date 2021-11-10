@@ -14,6 +14,7 @@ export const EXCHANGE_LIST_REPLY = 'EXCHANGE_LIST_REPLY';
 export const EXCHANGE_LIST_REQUEST = 'EXCHANGE_LIST_REQUEST';
 export const COIN_INFO_LIST_REQUEST = 'COIN_INFO_LIST_REQUEST';
 export const COIN_INFO_LIST_REPLY = 'COIN_INFO_LIST_REPLY';
+export const NEW_SIGNAL_EVENT = 'NEW_SIGNAL_EVENT';
 
 export const natsClient = (function () {
      console.log('creating nats client');
