@@ -26,8 +26,12 @@ export function addSignal(data: Signal) {
                          }
                          return resolve(res);
                     });
+               } else {
+                    /**
+                     * reject here to fall in catch clause of signal generator
+                     */
+                    reject('duplicated signals, nothing happend');
                }
-               resolve(null);
           });
      });
 }
@@ -69,7 +73,10 @@ export function getLiveSignals(req, res, next) {
      if (interval) query.interval = interval;
      if (signal) query.name = signal;
      if (interval) {
+          const nb = getLocationThreshold(interval);
           SignalModel.find(query)
+               .where('location')
+               .gte(nb)
                .populate('coin')
                .exec(function (err, result) {
                     if (err) {
