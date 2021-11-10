@@ -38,7 +38,7 @@ export const frameMap = {
      '1d': 86400000,
 };
 
-export function getLocationThreshold(interval: string, threshold: number = 5) {
+export function getLocationThreshold(interval: string, threshold: number = 3) {
      return +new Date() - threshold * frameMap[interval];
 }
 
