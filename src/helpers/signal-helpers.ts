@@ -52,5 +52,5 @@ export function createSignalKey(
      for (let one of candleSticks) {
           signal = signal + one;
      }
-     return createHash('sha256').update(signal).digest('base64');
+     return createHash('sha256').update(signal).digest('hex');
 }
