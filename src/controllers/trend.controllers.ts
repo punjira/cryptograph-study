@@ -3,16 +3,19 @@ import { TrendModel, Trend } from '../models/trend-model';
 import { TrendUpdateMessage } from '../jobs/caller';
 
 export function getTrendsForAsset(req, res, next) {
-     const symbol = req.query.symbol;
+     const symbol = req.params.symbol;
      const interval = req.params.interval;
-     TrendModel.find({}, function (err, result) {
-          if (err) {
-               throw new InternalServerError();
+     TrendModel.find(
+          { ticker: symbol, interval: interval },
+          function (err, result) {
+               if (err) {
+                    throw new InternalServerError();
+               }
+               return res.status(200).json({
+                    data: result,
+               });
           }
-          return res.status(200).json({
-               data: result,
-          });
-     });
+     );
 }
 
 export function promisedGetTrendForAsset(ticker, interval): Promise<Trend> {
