@@ -49,6 +49,21 @@ export function getSignals(req, res, next) {
           });
 }
 
+export function getSignal(req, res, next) {
+     const signal = req.params.signal;
+     SignalModel.findOne({ signal_key: decodeURIComponent(signal) })
+          .populate('coin')
+          .populate('candlesticks')
+          .exec(function (err, result) {
+               if (err) {
+                    throw new InternalServerError();
+               }
+               return res.status(200).json({
+                    data: result,
+               });
+          });
+}
+
 export function promisedGetSignals(
      ticker?: string,
      interval?: string,
