@@ -12,6 +12,7 @@ export interface Feed {
      signal: string;
      coin: Coin;
      interval?: string;
+     name: string;
 }
 
 const intervalMap: { [key: string]: string } = {
@@ -36,5 +37,6 @@ export function createP1stgFeed(signal: Signal, coin: Coin): Feed {
           location: signal.location,
           interval: signal.interval,
           signal: signal.signal_key,
+          name: 'p_1_st_g',
      };
 }
