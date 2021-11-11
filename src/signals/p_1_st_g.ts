@@ -12,7 +12,12 @@ import {
      reversal_positives,
 } from '../helpers/candlestick-helper';
 import { addSignal } from '../controllers/signal-controller';
-import { natsClient, NEW_SIGNAL_EVENT } from '../nats/nat-helper';
+import {
+     natsClient,
+     NEW_SIGNAL_EVENT,
+     SIGNAL_FEED_EVENT,
+} from '../nats/nat-helper';
+import { createP1stgFeed } from '../helpers/feed-helpers';
 
 function laps(_: number, c: number, k: string): number {
      return _ - c * frameMap[k];
@@ -60,6 +65,11 @@ export default async function p1R(one: string, ol: string) {
                     y._id
                );
                await addSignal(m4);
+               const feed = createP1stgFeed(m4, y);
+               natsClient
+                    .getInstance()
+                    .getClient()
+                    .publish(SIGNAL_FEED_EVENT, JSON.stringify(feed));
                natsClient
                     .getInstance()
                     .getClient()
