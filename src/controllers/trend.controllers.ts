@@ -18,6 +18,17 @@ export function getTrendsForAsset(req, res, next) {
      );
 }
 
+export function getAllTrends(req, res, next) {
+     TrendModel.find({}, function (err, result) {
+          if (err) {
+               throw new InternalServerError();
+          }
+          return res.status(200).json({
+               data: result,
+          });
+     });
+}
+
 export function promisedGetTrendForAsset(ticker, interval): Promise<Trend> {
      return new Promise((resolve, reject) => {
           TrendModel.findOne(
