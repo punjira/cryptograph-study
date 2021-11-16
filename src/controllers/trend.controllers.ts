@@ -5,7 +5,7 @@ import { TrendUpdateMessage } from '../jobs/caller';
 export function getTrendsForAsset(req, res, next) {
      const symbol = req.params.symbol;
      const interval = req.query.interval;
-     TrendModel.find(
+     TrendModel.findOne(
           { ticker: symbol, interval: interval },
           function (err, result) {
                if (err) {
