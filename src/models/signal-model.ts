@@ -1,5 +1,16 @@
 import mongoose from 'mongoose';
 
+export interface TrendSnapshot {
+     location: number;
+     direction: -1 | 1 | 0;
+}
+
+export interface IndicatorSnapshot {
+     location: number;
+     base_indicator: string;
+     details: string;
+}
+
 export interface Signal {
      location: number;
      ticker: string;
@@ -14,6 +25,8 @@ export interface Signal {
      stop_loss?: number;
      c_score?: number;
      signal_key: string;
+     trend: TrendSnapshot;
+     indicators: IndicatorSnapshot[];
 }
 
 const SignalSchema = new mongoose.Schema<Signal>({
@@ -43,6 +56,7 @@ const SignalSchema = new mongoose.Schema<Signal>({
                ref: 'Candlesticks',
           },
      ],
+
      coin: {
           required: true,
           type: mongoose.Schema.Types.ObjectId,
@@ -72,6 +86,31 @@ const SignalSchema = new mongoose.Schema<Signal>({
           required: true,
           type: String,
      },
+     trend: {
+          location: {
+               type: Number,
+               required: true,
+          },
+          direction: {
+               type: Number,
+          },
+     },
+     indicators: [
+          {
+               location: {
+                    type: String,
+                    required: true,
+               },
+               base_indicator: {
+                    type: String,
+                    required: true,
+               },
+               details: {
+                    type: String,
+                    required: true,
+               },
+          },
+     ],
 });
 
 const SignalModel = mongoose.model<Signal>('Signal', SignalSchema);
