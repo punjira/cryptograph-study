@@ -26,18 +26,18 @@ function laps(_: number, c: number, k: string): number {
 export default async function p1R(one: string, ol: string) {
      try {
           const m1 = one;
-          const k = await d(m1, ol); // trend
+          const k = await d(m1, ol);
           const y = await b(m1);
           if (!k) return;
           if (k.started_at < 50) return;
-          const i9 = await e(m1, ol, 'stochastic'); // indicator
-          const i8 = await f(m1); // last price date
+          const i9 = await e(m1, ol, 'stochastic');
+          const i8 = await f(m1);
           if (!i9) return;
           if (!i8) return;
           if (laps(i8.date, 3, ol) > i9.location) return;
           if (k.direction === 1 && i9.details === 'overbought') return;
           if (k.direction === -1 && i9.details === 'oversold') return;
-          const hk2 = await g(m1, ol); // candlesticks
+          const hk2 = await g(m1, ol);
           const rt = hk2.filter((el) => {
                if (
                     laps(i8.date, 3, ol) < el.location &&
@@ -62,7 +62,9 @@ export default async function p1R(one: string, ol: string) {
                     k.direction === 1 ? 'long' : 'short',
                     'p_1_st_g',
                     rt.filter((el) => el._id),
-                    y._id
+                    y._id,
+                    k,
+                    [i9]
                );
                await addSignal(m4);
                const feed = createP1stgFeed(m4, y);
