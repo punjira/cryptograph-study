@@ -1,6 +1,8 @@
 import { ObjectId } from 'mongoose';
 import { Signal } from '../models/signal-model';
 import { createHash } from 'crypto';
+import { Trend } from '../models/trend-model';
+import { Indicator } from '../models/indicator-model';
 
 export function createSignalObject(
      key: string,
@@ -9,7 +11,9 @@ export function createSignalObject(
      direction: string,
      name: string,
      candlesticks: ObjectId[],
-     coin: ObjectId
+     coin: ObjectId,
+     trend: Trend,
+     indicator: Indicator[]
 ): Signal {
      const signal_key = createSignalKey(key, name, direction, candlesticks);
      return {
@@ -23,6 +27,15 @@ export function createSignalObject(
           candlesticks: candlesticks,
           signal_key,
           coin,
+          trend: {
+               direction: trend.direction,
+               location: trend.location,
+          },
+          indicators: indicator.map((el) => ({
+               base_indicator: el.base_indicator,
+               details: el.details,
+               location: el.location,
+          })),
      };
 }
 
